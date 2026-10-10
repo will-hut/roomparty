@@ -95,20 +95,27 @@
             </div>
 
             {#if view.actor.type === "HOST"}
-                <button class="frutiger-aero-button" onclick={() => send({ type: "REGRESS_GAME" })}>
-                    Regress
-                </button>
-                <button class="frutiger-aero-button" onclick={() => send({ type: "ADVANCE_GAME" })}>
-                    Advance
-                </button>
+                <div class="m-1">
+                    <button class="frutiger-aero-button" onclick={() => send({ type: "REGRESS_GAME" })}>
+                        Regress
+                    </button>
+                </div>
+                <div class="m-1">
+                    <button class="pl-2 frutiger-aero-button" onclick={() => send({ type: "ADVANCE_GAME" })}>
+                        Advance
+                    </button>
+                </div>
             {/if}
             
 
             {#if view.actor.type != "UNASSIGNED"}
-                <div class="header-right pr-2">
-                    <p>{view.gamePlayer?.displayName}</p>
-                </div>
-                <div class="header-right">
+                {#if view.actor.type != "HOST" }
+                    <div class="header-right pr-2">
+                        <p>{view.gamePlayer?.displayName}</p>
+                    </div>
+                {/if}
+
+                <div class="header-right m-1">
                     <button class="frutiger-aero-button button-red" onclick={leave}>
                         Leave
                     </button>
@@ -271,29 +278,33 @@
 
                     {:else if view.phase === "RESULTS"}
                         <div class="frutiger-card frutiger-card-rounded w-full">
+                            <p class="text-2xl p-4">Average Rating: {(Object.values(view.currentVotes).reduce((sum, currentVote) => sum + currentVote.rating, 0) / Object.values(view.currentVotes).length).toFixed(2)}</p>
+
                             <div class="grid grid-cols-6 gap-2 p-4">
                                 {#each view.currentOptions as option}
-                                    <div class="overflow-hidden rounded-xl border border-gray-700 bg-gray-800">
+                                    {#if Object.entries(view.currentVotes).some(([playerId, vote]) => vote.optionId == option.id)}
+                                        <div class="overflow-hidden rounded-xl border border-gray-700 bg-gray-800">
 
-                                        <!-- Image -->
-                                        <img
-                                            class="block w-full p-2"
-                                            src={option.imageLink}
-                                            alt=""
-                                        />
+                                            <!-- Image -->
+                                            <img
+                                                class="block w-full p-2"
+                                                src={option.imageLink}
+                                                alt=""
+                                            />
 
-                                        <!-- Voters -->
-                                        <div class="px-3 py-2">
-                                            {#each Object.entries(view.currentVotes) as [playerId, vote]}
-                                                {#if vote.optionId === option.id}
-                                                    <div class="text-sm font-medium text-white">
-                                                        {view.players[playerId]?.displayName}
-                                                    </div>
-                                                {/if}
-                                            {/each}
+                                            <!-- Voters -->
+                                            <div class="px-3 py-2">
+                                                {#each Object.entries(view.currentVotes) as [playerId, vote]}
+                                                    {#if vote.optionId === option.id}
+                                                        <div class="text-sm font-medium text-white">
+                                                            {view.players[playerId]?.displayName}
+                                                        </div>
+                                                    {/if}
+                                                {/each}
+                                            </div>
+
                                         </div>
-
-                                    </div>
+                                    {/if}
                                 {/each}
                             </div>
                         </div>
